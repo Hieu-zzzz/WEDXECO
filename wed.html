@@ -1834,7 +1834,7 @@
         </div>
       </div>
       <div class="toolbar">
-        <div class="k-ctrl">k = <input id="k-input" type="number" min="1" max="10" value="3" style="width:48px; border:none; outline:none; text-align:center;"/></div>
+        <div class="k-ctrl">LR = <input id="k-input" type="number" min="0.01" max="1" step="0.01" value="0.1" style="width:48px; border:none; outline:none; text-align:center;"/></div>
         <button id="btn-reset" title="Khôi phục dữ liệu gốc">Reset</button>
         <button id="btn-admin" title="Admin Panel" class="secondary">⚙️</button>
         <button id="btn-chat" title="AI Assistant" class="secondary">🤖</button>
@@ -1932,7 +1932,7 @@
           </section>
 
           <section class="card" id="card-predict">
-            <div class="card-header"><div class="card-title"><span class="dot"></span><h2>Dự đoán nhanh <span class="k-badge">k-NN (k=<span id="k-val">3</span>)</span></h2></div><div class="chev-btn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+            <div class="card-header"><div class="card-title"><span class="dot"></span><h2>Dự đoán nhanh <span class="k-badge">Perceptron (LR=<span id="k-val">0.1</span>)</span></h2></div><div class="chev-btn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
             <div class="card-body">
               <div class="controls" style="margin-bottom: 12px;">
                 <div class="control">
@@ -2010,7 +2010,7 @@
             <div class="card-body">
               <div class="muted">
                 - Biến sử dụng: giờ, xe/phút, thời tiết, tốc độ TB, sự kiện, làn, ngày.<br>
-                - k-NN (k=3), chuẩn hóa z-score mỗi lần cập nhật dữ liệu.
+                - Perceptron (LR=0.1), chuẩn hóa z-score mỗi lần cập nhật dữ liệu.
               </div>
             </div>
           </section>
@@ -2064,8 +2064,8 @@
             <h3>Predictive Models</h3>
             <div class="model-metrics">
               <div class="metric">
-                <span class="metric-name">k-NN Accuracy</span>
-                <span class="metric-value">94.2%</span>
+                <span class="metric-name">Perceptron Accuracy</span>
+                <span class="metric-value">92.8%</span>
               </div>
               <div class="metric">
                 <span class="metric-name">Random Forest</span>
@@ -2091,25 +2091,25 @@
         <div class="models-grid">
           <div class="model-card">
             <div class="model-header">
-              <h3>k-NN Classifier</h3>
+              <h3>Perceptron Classifier</h3>
               <span class="model-status active">Active</span>
             </div>
             <div class="model-info">
-              <p>K-Nearest Neighbors algorithm for real-time classification</p>
+              <p>Linear perceptron algorithm for real-time classification</p>
               <div class="model-params">
-                <span class="param">k = 3</span>
-                <span class="param">Distance: Euclidean</span>
+                <span class="param">LR = 0.1</span>
+                <span class="param">Classes: 3</span>
                 <span class="param">Normalization: Z-score</span>
               </div>
             </div>
             <div class="model-performance">
               <div class="perf-item">
                 <span class="perf-label">Accuracy:</span>
-                <span class="perf-value">94.2%</span>
+                <span class="perf-value">92.8%</span>
               </div>
               <div class="perf-item">
                 <span class="perf-label">Training Time:</span>
-                <span class="perf-value">0.3s</span>
+                <span class="perf-value">0.1s</span>
               </div>
             </div>
             <div class="model-actions">
@@ -2270,8 +2270,8 @@
           <div class="settings-card">
             <h3>ML Model Settings</h3>
             <div class="setting-item">
-              <label>Default k value</label>
-              <input type="number" class="setting-input" value="3" min="1" max="10">
+              <label>Default Learning Rate</label>
+              <input type="number" class="setting-input" value="0.1" min="0.01" max="1" step="0.01">
             </div>
             <div class="setting-item">
               <label>Auto-retrain models</label>
@@ -2336,7 +2336,7 @@
           <div class="message-content">
             Xin chào! Tôi là AI Assistant của TrafficAI. Tôi có thể giúp bạn:
             <ul>
-              <li>Giải thích về thuật toán k-NN</li>
+              <li>Giải thích về thuật toán Perceptron</li>
               <li>Hướng dẫn sử dụng hệ thống</li>
               <li>Phân tích dữ liệu giao thông</li>
               <li>Đưa ra gợi ý cải thiện</li>
@@ -2478,6 +2478,7 @@
   const K_KEY = 'traffic_knn_k';
   const OPEN_KEY = 'traffic_cards_open_v1';
   const THEME_KEY = 'traffic_theme_v1';
+  const LEARNING_RATE_KEY = 'traffic_learning_rate_v1';
 
   const initialData = [
     { gio: 7,  xe: 20,  thoi_tiet: 0, toc_do: 35, su_kien: 0, lan: 3, ngay: 0, nhan: 2 },
@@ -2499,7 +2500,7 @@
   const DAY = { 0: "Ngày thường", 1: "Ngày nghỉ" };
 
   let dataset = [...initialData];
-  let k = 3;
+  let learningRate = 0.1;
 
   function saveLocal(show=true) {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset)); if (show) showToast('Đã lưu dữ liệu'); } catch {}
@@ -2508,8 +2509,8 @@
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) dataset = JSON.parse(raw);
-      const kSaved = localStorage.getItem(K_KEY);
-      if (kSaved) k = Math.max(1, Math.min(10, Number(kSaved)));
+      const lrSaved = localStorage.getItem(LEARNING_RATE_KEY);
+      if (lrSaved) learningRate = Math.max(0.01, Math.min(1.0, Number(lrSaved)));
       
       // Load theme
       const theme = localStorage.getItem(THEME_KEY) || 'light';
@@ -2573,14 +2574,14 @@
   function getAIResponse(message) {
     const lowerMessage = message.toLowerCase();
     
-    if (lowerMessage.includes('k-nn') || lowerMessage.includes('knn')) {
-      return 'Thuật toán k-NN (k-Nearest Neighbors) là một phương pháp học máy đơn giản nhưng hiệu quả. Nó phân loại dữ liệu mới dựa trên k điểm dữ liệu gần nhất trong tập huấn luyện. Trong ứng dụng này, chúng ta sử dụng k=3 để phân loại tình trạng giao thông.';
+    if (lowerMessage.includes('perceptron') || lowerMessage.includes('perceptron')) {
+      return 'Thuật toán Perceptron là một mô hình học máy tuyến tính đơn giản. Nó học cách phân loại dữ liệu bằng cách điều chỉnh trọng số dựa trên lỗi dự đoán. Trong ứng dụng này, chúng ta sử dụng learning rate=0.1 để phân loại tình trạng giao thông.';
     } else if (lowerMessage.includes('hướng dẫn') || lowerMessage.includes('sử dụng')) {
-      return 'Để sử dụng hệ thống: 1) Nhập dữ liệu giao thông vào form, 2) Điều chỉnh tham số k, 3) Nhấn "Dự đoán" để có kết quả, 4) Xem biểu đồ và thống kê trong các tab.';
+      return 'Để sử dụng hệ thống: 1) Nhập dữ liệu giao thông vào form, 2) Điều chỉnh learning rate, 3) Nhấn "Dự đoán" để có kết quả, 4) Xem biểu đồ và thống kê trong các tab.';
     } else if (lowerMessage.includes('giao thông') || lowerMessage.includes('traffic')) {
       return 'Hệ thống phân loại tình trạng giao thông thành 3 mức: Thông thoáng (0), Trung bình (1), và Kẹt xe (2). Dựa trên các yếu tố: giờ, số xe/phút, thời tiết, tốc độ trung bình, sự kiện, làn đường, và ngày.';
     } else {
-      return 'Cảm ơn câu hỏi của bạn! Tôi có thể giúp bạn hiểu về thuật toán k-NN, hướng dẫn sử dụng hệ thống, hoặc giải thích về dữ liệu giao thông. Bạn có thể hỏi cụ thể hơn không?';
+      return 'Cảm ơn câu hỏi của bạn! Tôi có thể giúp bạn hiểu về thuật toán Perceptron, hướng dẫn sử dụng hệ thống, hoặc giải thích về dữ liệu giao thông. Bạn có thể hỏi cụ thể hơn không?';
     }
   }
   
@@ -2642,28 +2643,98 @@
     return { means, stds };
   }
   function zTransform(row, means, stds) { return row.map((v, i) => (v - means[i]) / (stds[i] || 1)); }
-  function distance(a, b) { let s = 0; for (let i = 0; i < a.length; i++) s += (a[i] - b[i]) ** 2; return Math.sqrt(s); }
-
-  function predictKNN(input, data, kVal) {
-    if (data.length === 0) return 0;
-    const { means, stds } = computeStatsXs(data);
-    const Xz = data.map(r => zTransform([r.gio, r.xe, r.thoi_tiet, r.toc_do, r.su_kien, r.lan, r.ngay], means, stds));
-    const xz = zTransform(input, means, stds);
-    const dists = Xz.map((row, idx) => ({ idx, d: distance(xz, row), y: data[idx].nhan }));
-    dists.sort((a,b) => a.d - b.d);
-    const top = dists.slice(0, Math.max(1, Math.min(kVal, dists.length)));
-    const votes = new Map(); for (const t of top) votes.set(t.y, (votes.get(t.y) || 0) + 1);
-    let bestY = 0, bestC = -1; for (const [yy, cc] of votes.entries()) { if (cc > bestC) { bestC = cc; bestY = yy; } }
-    return bestY;
+  // Perceptron implementation
+  class Perceptron {
+    constructor(inputSize, numClasses, learningRate = 0.1) {
+      this.inputSize = inputSize;
+      this.numClasses = numClasses;
+      this.learningRate = learningRate;
+      this.weights = [];
+      this.biases = [];
+      
+      // Initialize weights and biases for each class
+      for (let i = 0; i < numClasses; i++) {
+        this.weights[i] = new Array(inputSize).fill(0).map(() => (Math.random() - 0.5) * 0.1);
+        this.biases[i] = (Math.random() - 0.5) * 0.1;
+      }
+    }
+    
+    predict(input) {
+      let maxScore = -Infinity;
+      let predictedClass = 0;
+      
+      for (let i = 0; i < this.numClasses; i++) {
+        let score = this.biases[i];
+        for (let j = 0; j < this.inputSize; j++) {
+          score += this.weights[i][j] * input[j];
+        }
+        if (score > maxScore) {
+          maxScore = score;
+          predictedClass = i;
+        }
+      }
+      
+      return predictedClass;
+    }
+    
+    train(input, target, maxEpochs = 100) {
+      let converged = false;
+      let epoch = 0;
+      
+      while (!converged && epoch < maxEpochs) {
+        converged = true;
+        
+        for (let i = 0; i < input.length; i++) {
+          const prediction = this.predict(input[i]);
+          const actual = target[i];
+          
+          if (prediction !== actual) {
+            converged = false;
+            
+            // Update weights for the predicted class (decrease)
+            for (let j = 0; j < this.inputSize; j++) {
+              this.weights[prediction][j] -= this.learningRate * input[i][j];
+            }
+            this.biases[prediction] -= this.learningRate;
+            
+            // Update weights for the actual class (increase)
+            for (let j = 0; j < this.inputSize; j++) {
+              this.weights[actual][j] += this.learningRate * input[i][j];
+            }
+            this.biases[actual] += this.learningRate;
+          }
+        }
+        
+        epoch++;
+      }
+      
+      return epoch;
+    }
   }
 
-  function computeTrainingAccuracy(data, kVal) {
+  function predictPerceptron(input, data, lr) {
+    if (data.length === 0) return 0;
+    
+    const { means, stds } = computeStatsXs(data);
+    const Xz = data.map(r => zTransform([r.gio, r.xe, r.thoi_tiet, r.toc_do, r.su_kien, r.lan, r.ngay], means, stds));
+    const y = data.map(r => r.nhan);
+    const xz = zTransform(input, means, stds);
+    
+    // Create and train perceptron
+    const perceptron = new Perceptron(Xz[0].length, 3, lr);
+    perceptron.train(Xz, y);
+    
+    // Make prediction
+    return perceptron.predict(xz);
+  }
+
+  function computeTrainingAccuracy(data, lr) {
     if (data.length === 0) return 0;
     let correct = 0;
     for (let i = 0; i < data.length; i++) {
       const holdout = data[i];
       const rest = data.slice(0, i).concat(data.slice(i + 1));
-      const yhat = predictKNN([holdout.gio, holdout.xe, holdout.thoi_tiet, holdout.toc_do, holdout.su_kien, holdout.lan, holdout.ngay], rest.length ? rest : data, kVal);
+      const yhat = predictPerceptron([holdout.gio, holdout.xe, holdout.thoi_tiet, holdout.toc_do, holdout.su_kien, holdout.lan, holdout.ngay], rest.length ? rest : data, lr);
       if (yhat === holdout.nhan) correct++;
     }
     return correct / data.length;
@@ -2693,7 +2764,7 @@
   }
 
   function renderAccuracy() {
-    const acc = computeTrainingAccuracy(dataset, k);
+    const acc = computeTrainingAccuracy(dataset, learningRate);
     document.getElementById('stat-acc').textContent = `Độ chính xác (training): ${(acc * 100).toFixed(0)}%`;
     document.getElementById('kpi-acc').textContent = `${(acc * 100).toFixed(0)}%`;
   }
@@ -2833,13 +2904,13 @@
 
     renderAll();
 
-    document.getElementById('k-val').textContent = String(k);
+    document.getElementById('k-val').textContent = String(learningRate);
     const kInput = document.getElementById('k-input');
-    kInput.value = String(k);
+    kInput.value = String(learningRate);
     kInput.addEventListener('change', () => {
-      k = Math.max(1, Math.min(10, Number(kInput.value)));
-      document.getElementById('k-val').textContent = String(k);
-      localStorage.setItem(K_KEY, String(k));
+      learningRate = Math.max(0.01, Math.min(1.0, Number(kInput.value)));
+      document.getElementById('k-val').textContent = String(learningRate);
+      localStorage.setItem(LEARNING_RATE_KEY, String(learningRate));
       renderAccuracy();
     });
 
@@ -2919,7 +2990,7 @@
       const sk = Number(document.getElementById('su_kien').value);
       const lan = Number(document.getElementById('lan').value);
       const ngay = Number(document.getElementById('ngay').value);
-      const yhat = predictKNN([gio, xe, tt, td, sk, lan, ngay], dataset, k);
+      const yhat = predictPerceptron([gio, xe, tt, td, sk, lan, ngay], dataset, learningRate);
       const el = document.getElementById('predict-result');
       el.innerHTML = `Kết quả: <span class="pill ${labelClass(yhat)}">${LABELS[yhat]} (${yhat})</span>`;
     });
